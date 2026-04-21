@@ -1,0 +1,24 @@
+{
+  "name": "midscene-test-platform",
+  "version": "1.0.0",
+  "description": "基于 Midscene.js 的可视化自动化测试平台",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "pnpm --filter @mtp/web dev",
+    "dev:server": "pnpm --filter @mtp/server dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

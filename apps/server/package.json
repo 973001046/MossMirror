@@ -1,0 +1,32 @@
+{
+  "name": "@mtp/server",
+  "version": "1.0.0",
+  "description": "Midscene 测试平台后端服务",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "js-yaml": "^4.1.0",
+    "uuid": "^9.0.0",
+    "@midscene/cli": "latest",
+    "chokidar": "^3.6.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.11",
+    "@types/js-yaml": "^4.0.9",
+    "@types/uuid": "^9.0.8",
+    "@types/fs-extra": "^11.0.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}
