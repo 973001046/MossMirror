@@ -1,0 +1,34 @@
+# 示例脚本：登录流程测试
+# 描述: 演示登录功能测试
+
+web:
+  url: https://example.com/login
+  viewportWidth: 1280
+  viewportHeight: 720
+
+agent:
+  testId: login-example
+  generateReport: true
+  aiActContext: "这是一个登录页面，需要输入用户名和密码进行身份验证"
+
+tasks:
+  - name: 填写登录表单
+    flow:
+      - aiInput:
+          prompt: 用户名输入框
+          content: "testuser"
+      - aiInput:
+          prompt: 密码输入框
+          content: "Test@123456"
+
+  - name: 提交登录
+    flow:
+      - aiTap: 登录按钮
+      - aiWaitFor: 页面跳转到首页或显示登录成功消息
+      - sleep: 2000
+      - aiAssert: 用户已成功登录，页面显示用户头像或用户名
+
+  - name: 验证登录状态
+    flow:
+      - aiAssert: 页面上有退出登录或登出按钮
+      - aiAssert: 页面不显示登录表单

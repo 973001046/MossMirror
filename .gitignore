@@ -42,10 +42,10 @@ coverage/
 # Data
 data/
 temp/
-reports/*.html
-reports/*.json
-scripts/*.yaml
-scripts/*.yml
+# reports/*.html
+# reports/*.json
+# scripts/*.yaml
+# scripts/*.yml
 
 # Misc
 .cache/

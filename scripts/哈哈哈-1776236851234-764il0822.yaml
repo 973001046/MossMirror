@@ -1,0 +1,13 @@
+web:
+  url: https://www.bing.com
+  viewportWidth: 1280
+  viewportHeight: 720
+tasks:
+  - name: 示例任务
+    flow:
+      - aiInput:
+          prompt: 搜索框
+          content: Midscene.js
+      - aiTap: 搜索按钮
+      - sleep: 3000
+      - aiAssert: 页面显示搜索结果

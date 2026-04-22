@@ -1,0 +1,28 @@
+# 示例脚本：网页搜索测试
+# 描述: 演示基本的搜索功能测试
+
+web:
+  url: https://www.bing.com
+  viewportWidth: 1280
+  viewportHeight: 720
+
+agent:
+  testId: search-example
+  generateReport: true
+  aiActContext: "这是一个搜索引擎页面，用户想要搜索关于 Midscene.js 的信息"
+
+tasks:
+  - name: 搜索 Midscene.js
+    flow:
+      - aiInput:
+          prompt: 搜索框
+          content: "Midscene.js 自动化测试"
+      - aiTap: 搜索按钮
+      - sleep: 3000
+      - aiAssert: 页面显示搜索结果
+
+  - name: 验证第一个结果
+    flow:
+      - aiTap: 第一个搜索结果链接
+      - sleep: 2000
+      - aiAssert: 页面包含 Midscene.js 相关信息
