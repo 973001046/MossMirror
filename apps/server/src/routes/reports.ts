@@ -1,6 +1,7 @@
 import express from 'express';
 import * as reportService from '../services/reportService.js';
 import * as scriptService from '../services/scriptService.js';
+import * as executionReportService from '../services/executionReportService.js';
 
 const router = express.Router();
 
@@ -90,10 +91,29 @@ router.get('/stats/overview', async (req, res) => {
   try {
     const scripts = await scriptService.getAllScripts();
     const stats = await reportService.getStatistics();
+    const aiStats = await executionReportService.getAIExecutionStatistics();
 
-    stats.totalScripts = scripts.length;
+    // 合并 AI 执行报告的统计
+    const totalExecutions = stats.totalExecutions + aiStats.total;
+    const passedExecutions = Math.round(stats.totalExecutions * (stats.passRate / 100)) + aiStats.success;
+    const passRate = totalExecutions > 0 ? (passedExecutions / totalExecutions) * 100 : 0;
 
-    res.json({ success: true, data: stats });
+    // 合并最近7天活动数据
+    const mergedActivity = stats.recentActivity.map((day, index) => ({
+      date: day.date,
+      count: day.count + (aiStats.recentActivity[index]?.count || 0)
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        totalScripts: scripts.length,
+        totalReports: stats.totalReports,
+        totalExecutions,
+        passRate: Math.round(passRate * 100) / 100,
+        recentActivity: mergedActivity
+      }
+    });
   } catch (error) {
     res.status(500).json({
       success: false,

@@ -21,7 +21,8 @@ import {
   EyeOutlined,
   ThunderboltOutlined,
   SearchOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  ExportOutlined
 } from '@ant-design/icons';
 import { executionReportApi } from '../../services/api';
 import dayjs from 'dayjs';
@@ -145,6 +146,10 @@ const ExecutionReportList: React.FC = () => {
     return texts[mode] || mode;
   };
 
+  const handleOpenOriginal = (report: ExecutionReport) => {
+    window.open(`/ai-reports/${report.filename}`, '_blank');
+  };
+
   const columns = [
     {
       title: '执行时间',
@@ -221,13 +226,13 @@ const ExecutionReportList: React.FC = () => {
           >
             详情
           </Button>
-          {/* <Button
+          <Button
             icon={<ExportOutlined />}
             size="small"
             onClick={() => handleOpenOriginal(record)}
           >
             原页
-          </Button> */}
+          </Button>
           <Popconfirm
             title="确认删除"
             description="确定要删除这份执行报告吗？"

@@ -3,6 +3,8 @@ import axios from 'axios';
 /// <reference types="vite/client" />
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api';
 
+console.log('API_BASE_URL', import.meta);
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -127,8 +129,10 @@ export const executeApi = {
         onProgress(data);
       };
 
-      eventSource.onerror = () => {
+      eventSource.onerror = (error) => {
         eventSource.close();
+        // 通知调用方发生了错误
+        onProgress({ type: 'execute:error', error: '连接失败，请稍后再试！' });
       };
 
       return () => eventSource.close();

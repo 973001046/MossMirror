@@ -6,49 +6,71 @@ import { BatchConfig } from '../models/types.js';
 
 const router = express.Router();
 
-// 执行单个脚本
+// 执行脚本的核心逻辑
+async function executeScriptCore(scriptId: string, res: express.Response, useSSE: boolean) {
+  const result = await scriptService.getScriptContent(scriptId);
+
+  if (!result) {
+    if (useSSE) {
+      res.write(`data: ${JSON.stringify({ type: 'execute:end', data: { success: false, error: 'Script not found' } })}\n\n`);
+      res.end();
+      return;
+    }
+    return res.status(404).json({ success: false, error: 'Script not found' });
+  }
+
+  if (useSSE) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const executeResult = await executeService.executeScript(
+      result.meta,
+      result.content,
+      (message) => {
+        res.write(`data: ${JSON.stringify(message)}\n\n`);
+      }
+    );
+
+    res.write(`data: ${JSON.stringify({ type: 'done', data: executeResult })}\n\n`);
+    res.end();
+  } else {
+    // 普通 HTTP 请求，直接返回结果
+    const executeResult = await executeService.executeScript(result.meta, result.content);
+
+    // 生成报告
+    const report = await reportService.getAllReports().then(reports => {
+      return reports.find(r => r.scriptId === result.meta.id);
+    });
+
+    res.json({
+      success: true,
+      data: {
+        result: executeResult,
+        reportId: report?.id
+      }
+    });
+  }
+}
+
+// GET 路由 - 支持 SSE (EventSource 只能发起 GET 请求)
+router.get('/:scriptId', async (req, res) => {
+  try {
+    await executeScriptCore(req.params.scriptId, res, true);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// POST 路由 - 支持普通 HTTP 请求和 SSE
 router.post('/:scriptId', async (req, res) => {
   try {
-    const result = await scriptService.getScriptContent(req.params.scriptId);
-
-    if (!result) {
-      return res.status(404).json({ success: false, error: 'Script not found' });
-    }
-
-    // 使用 Server-Sent Events 返回实时进度
     const acceptHeader = req.headers.accept || '';
-    if (acceptHeader.includes('text/event-stream')) {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-
-      const executeResult = await executeService.executeScript(
-        result.meta,
-        result.content,
-        (message) => {
-          res.write(`data: ${JSON.stringify(message)}\n\n`);
-        }
-      );
-
-      res.write(`data: ${JSON.stringify({ type: 'done', data: executeResult })}\n\n`);
-      res.end();
-    } else {
-      // 普通 HTTP 请求，直接返回结果
-      const executeResult = await executeService.executeScript(result.meta, result.content);
-
-      // 生成报告
-      const report = await reportService.getAllReports().then(reports => {
-        return reports.find(r => r.scriptId === result.meta.id);
-      });
-
-      res.json({
-        success: true,
-        data: {
-          result: executeResult,
-          reportId: report?.id
-        }
-      });
-    }
+    const useSSE = acceptHeader.includes('text/event-stream');
+    await executeScriptCore(req.params.scriptId, res, useSSE);
   } catch (error) {
     res.status(500).json({
       success: false,

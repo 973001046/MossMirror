@@ -101,15 +101,21 @@ const ScriptList: React.FC = () => {
       message.loading({ content: `正在执行: ${script.name}`, key: script.id, duration: 0 });
 
       await executeApi.execute(script.id, (data) => {
-        if (data.type === 'execute:end') {
-          if (data.data.success) {
+        if (data?.type === 'execute:end') {
+          if (data.data?.success) {
             message.success({ content: '执行成功', key: script.id });
           } else {
-            message.error({ content: `执行失败: ${data.data.error}`, key: script.id });
+            message.error({ content: `执行失败: ${data.data?.error || '未知错误'}`, key: script.id });
           }
           setExecuting(null);
           loadScripts();
+        } else if (data?.type === 'execute:error') {
+          // 处理 SSE 连接错误（如 404）
+          console.log('data:', data)
+          message.error({ content: `执行失败: ${data.error || '连接错误'}`, key: script.id });
+          setExecuting(null);
         }
+        console.log('data', data);
       });
     } catch (error) {
       message.error({ content: '执行失败', key: script.id });

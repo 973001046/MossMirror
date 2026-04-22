@@ -3,11 +3,9 @@ web:
   viewportWidth: 1280
   viewportHeight: 720
 tasks:
-  - name: 示例任务
+  - name: 搜索好买基金
     flow:
-      - aiInput:
-          prompt: 搜索框
-          content: Midscene.js
-      - aiTap: 搜索按钮
-      - sleep: 3000
-      - aiAssert: 页面显示搜索结果
+      - ai: 搜索 "好买基金"
+  - name: 检查结果
+    flow:
+      - aiAssert: 结果是否包含 "哈哈哈哈"

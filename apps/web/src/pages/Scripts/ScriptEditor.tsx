@@ -182,6 +182,8 @@ const ScriptEditor: React.FC = () => {
         } else {
           message.error({ content: `执行失败: ${res.data.error || '未知错误'}`, key: 'execute' });
         }
+      } else {
+        message.error({ content: '执行失败', key: 'execute' });
       }
     } catch (error) {
       message.error({ content: '执行失败', key: 'execute' });
